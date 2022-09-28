@@ -143,11 +143,12 @@ public class QChatChannelViewController: QChatTableViewController, QChatTextEdit
 //    MARK: event
 
   @objc func createChannel() {
-    guard let name = viewModel?.name, name.count > 0 else {
-      showToast(localizable("channelName_cannot_be_empty"))
-      return
-    }
-
+      
+      guard let name = viewModel?.name,name.count > 0 else {
+          self.showToast("频道名称不能为空")
+          return
+      }
+      
     if !isCreatedChannel {
       isCreatedChannel = true
       viewModel?.createChannel { error, channel in

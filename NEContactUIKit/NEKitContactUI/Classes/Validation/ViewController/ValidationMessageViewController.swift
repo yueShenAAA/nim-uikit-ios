@@ -19,7 +19,7 @@ public class ValidationMessageViewController: ContactBaseViewController {
     super.viewDidLoad()
 
     // Do any additional setup after loading the view.
-    title = localizable("validation_message")
+    title = localizable("验证消息")
     // viewModel.getValidationMessage()
     setupUI()
     weak var weakSelf = self
@@ -34,7 +34,7 @@ public class ValidationMessageViewController: ContactBaseViewController {
 
   func setupUI() {
     let clearItem = UIBarButtonItem(
-      title: localizable("clear"),
+      title: "清空",
       style: .done,
       target: self,
       action: #selector(clearMessage)
@@ -63,7 +63,7 @@ public class ValidationMessageViewController: ContactBaseViewController {
 
   @objc func clearMessage() {
     weak var weakSelf = self
-    showAlert(message: localizable("clear_all_validate_message")) {
+    showAlert(message: "是否要清除所有验证消息？") {
       weakSelf?.viewModel.clearAllNoti {
         weakSelf?.tableView.reloadData()
       }

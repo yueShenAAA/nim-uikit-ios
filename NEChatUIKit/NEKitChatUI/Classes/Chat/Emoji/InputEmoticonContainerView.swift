@@ -350,4 +350,8 @@ extension InputEmoticonContainerView: NIMInputEmoticonButtonDelegate {
       )
     }
   }
+    
+    public func sendEmoji() {
+        
+    }
 }

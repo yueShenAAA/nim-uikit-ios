@@ -25,10 +25,11 @@ public class ChatUIConfig: NSObject {
   public var timeColor = UIColor.ne_emptyTitleColor
 
   // 右侧聊天背景气泡
-  public var rightBubbleBg = UIImage.ne_imageNamed(name: "chat_message_send")
-
+//  public var rightBubbleBg = UIImage.ne_imageNamed(name: "chat_message_send")
+  public var rightBubbleBg = UIImage.init(named: "Rectangle 749")
   // 左侧聊天背景气泡
-  public var leftBubbleBg = UIImage.ne_imageNamed(name: "chat_message_receive")
+//  public var leftBubbleBg = UIImage.ne_imageNamed(name: "chat_message_receive")
+  public var leftBubbleBg = UIImage.init(named: "Rectangle 662")
 
   /// 聊天字体大小(文本类型)
   public var messageFont = UIFont.systemFont(ofSize: 16)

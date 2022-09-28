@@ -4,7 +4,6 @@
 // found in the LICENSE file.
 
 import Foundation
-import NEKitCommon
 
 public extension Bundle {
   class func nim_defaultEmojiBundle() -> Bundle? {
@@ -19,10 +18,8 @@ public extension Bundle {
 
   class func nim_EmojiPlistFile() -> String? {
     let bundle = Bundle.nim_defaultEmojiBundle()
-
-    let resource = (CommonTool.getCurrentLanguage() == "cn") ?"emoji_ios_cn" : "emoji_ios_en"
     let filepath = bundle?.path(
-      forResource: resource,
+      forResource: "emoji_ios_new",
       ofType: "plist",
       inDirectory: NIMKit_EmojiPath
     )

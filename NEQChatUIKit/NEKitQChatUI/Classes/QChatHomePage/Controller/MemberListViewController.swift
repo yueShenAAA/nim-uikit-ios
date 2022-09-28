@@ -6,8 +6,7 @@
 import UIKit
 import NEKitCoreIM
 import NEKitCore
-public class MemberListViewController: NEBaseViewController, UITableViewDelegate,
-  UITableViewDataSource {
+public class MemberListViewController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
   public var serverViewModel = CreateServerViewModel()
   public var memberViewModel = MemberListViewModel()
 
@@ -38,7 +37,7 @@ public class MemberListViewController: NEBaseViewController, UITableViewDelegate
   }
 
   func initializeConfig() {
-    title = localizable("qchat_member")
+    title = "成员"
     addRightAction(UIImage.ne_imageNamed(name: "sign_add"), #selector(addMemberClick), self)
   }
 
@@ -68,76 +67,78 @@ public class MemberListViewController: NEBaseViewController, UITableViewDelegate
     tableView.estimatedRowHeight = 125
     return tableView
   }()
-
-  // MAKR: UITableViewDelegate, UITableViewDataSource
-  @objc func addMemberClick(sender: UIButton) {
-    Router.shared.register(ContactSelectedUsersRouter) { [weak self] param in
-      print("param\(param)")
-      if let userIds = param["accids"] as? [String] {
-        print("userIds:\(userIds)")
-        guard let serverId = self?.serverId else { return }
-        self?.serverViewModel
-          .inviteMembersToServer(serverId: serverId, accids: userIds) { error in
-            if error == nil {
-              self?.requestData()
+    
+    //MAKR: UITableViewDelegate, UITableViewDataSource
+    @objc func addMemberClick(sender: UIButton) {
+      Router.shared.register(ContactSelectedUsersRouter) { [weak self] param in
+        print("param\(param)")
+        if let userIds = param["accids"] as? [String] {
+          print("userIds:\(userIds)")
+          guard let serverId = self?.serverId else { return }
+          self?.serverViewModel
+            .inviteMembersToServer(serverId: serverId, accids: userIds) { error in
+              if error == nil {
+                self?.requestData()
+              }
             }
-          }
+        }
       }
+
+      Router.shared
+        .use(ContactUserSelectRouter,
+             parameters: ["nav": navigationController]) { obj, routerState, str in
+          print("obj:\(obj) routerState:\(routerState) str:\(str)")
+        }
+
+  //        FIXME: router
+  //        let contactCtrl = ContactsSelectedViewController()
+  //        self.navigationController?.pushViewController(contactCtrl, animated: true)
+  //        weak var weakSelf = self
+  //
+  //        contactCtrl.callBack = {(selectMemberarray)->Void in
+  //
+  //            guard let serverId = weakSelf?.serverId else { return  }
+  //            var accidArray = [String]()
+  //            selectMemberarray.forEach { memberInfo in
+  //                accidArray.append(memberInfo.user?.userId ?? "")
+  //            }
+  //            weakSelf?.serverViewModel.inviteMembersToServer(serverId: serverId, accids: accidArray) { error in
+  //                if error == nil{
+  //                    weakSelf?.requestData()
+  //                }
+  //            }
+  //        }
     }
 
-    Router.shared
-      .use(ContactUserSelectRouter,
-           parameters: ["nav": navigationController]) { obj, routerState, str in
-        print("obj:\(obj) routerState:\(routerState) str:\(str)")
-      }
-
-    //        FIXME: router
-    //        let contactCtrl = ContactsSelectedViewController()
-    //        self.navigationController?.pushViewController(contactCtrl, animated: true)
-    //        weak var weakSelf = self
-    //
-    //        contactCtrl.callBack = {(selectMemberarray)->Void in
-    //
-    //            guard let serverId = weakSelf?.serverId else { return  }
-    //            var accidArray = [String]()
-    //            selectMemberarray.forEach { memberInfo in
-    //                accidArray.append(memberInfo.user?.userId ?? "")
-    //            }
-    //            weakSelf?.serverViewModel.inviteMembersToServer(serverId: serverId, accids: accidArray) { error in
-    //                if error == nil{
-    //                    weakSelf?.requestData()
-    //                }
-    //            }
-    //        }
-  }
-
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    dataArray?.count ?? 0
-  }
-
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(NSStringFromClass(NEGroupIdentityMemberCell.self))",
-      for: indexPath
-    ) as! NEGroupIdentityMemberCell
-    cell.memberModel = dataArray?[indexPath.row]
-    return cell
-  }
-
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    //        let user = viewModel.limitUsers[indexPath.row]
-    if let member = dataArray?[indexPath.row] {
-      let editMember = QChatEditMemberViewController()
-      editMember.deleteCompletion = {
-        self.requestData()
-      }
-      editMember.changeCompletion = {
-        self.requestData()
-      }
-      let user = UserInfo(member)
-      editMember.user = user
-      navigationController?.pushViewController(editMember, animated: true)
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      dataArray?.count ?? 0
     }
-  }
+
+    public func tableView(_ tableView: UITableView,
+                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      let cell = tableView.dequeueReusableCell(
+        withIdentifier: "\(NSStringFromClass(NEGroupIdentityMemberCell.self))",
+        for: indexPath
+      ) as! NEGroupIdentityMemberCell
+      cell.memberModel = dataArray?[indexPath.row]
+      return cell
+    }
+
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+  //        let user = viewModel.limitUsers[indexPath.row]
+      if let member = dataArray?[indexPath.row] {
+        let editMember = QChatEditMemberViewController()
+        editMember.deleteCompletion = {
+          self.requestData()
+        }
+        editMember.changeCompletion = {
+          self.requestData()
+        }
+        let user = UserInfo(member)
+        editMember.user = user
+        navigationController?.pushViewController(editMember, animated: true)
+      }
+    }
 }
+
+

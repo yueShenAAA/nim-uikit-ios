@@ -283,7 +283,7 @@ public class TeamSettingViewModel {
 
       if error == nil {
         weakSelf?.getData()
-        weakSelf?.getCurrentMember(IMKitEngine.instance.imAccid, teamId)
+        weakSelf?.getCurrentMember(IMKitLoginManager.instance.imAccid, teamId)
       }
       completion(error)
     }
@@ -307,7 +307,7 @@ public class TeamSettingViewModel {
 
   func isOwner() -> Bool {
     if let accid = teamInfoModel?.team?.owner {
-      if IMKitEngine.instance.isMySelf(accid) {
+      if IMKitLoginManager.instance.isMySelf(accid) {
         return true
       }
     }

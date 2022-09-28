@@ -37,16 +37,16 @@ public class ContactRemakNameViewController: ContactBaseViewController, UITextFi
   func setupUI() {
     view.backgroundColor = UIColor(hexString: "F2F4F5")
     let clearItem = UIBarButtonItem(
-      title: localizable("save"),
+      title: "保存",
       style: .done,
       target: self,
       action: #selector(saveAlias)
     )
     clearItem.tintColor = UIColor(hexString: "337EFF")
     navigationItem.rightBarButtonItem = clearItem
-    title = localizable("noteName")
+    title = localizable("备注名")
     view.addSubview(aliasInput)
-    aliasInput.placeholder = localizable("input_noteName")
+    aliasInput.placeholder = "输入备注名"
     NSLayoutConstraint.activate([
       aliasInput.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
       aliasInput.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),

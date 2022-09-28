@@ -17,6 +17,7 @@ class ChatRevokeLeftCell: ChatBaseLeftCell {
   }
 
   func commonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     label.translatesAutoresizingMaskIntoConstraints = false
     label.textColor = UIColor.ne_greyText
     label.font = UIFont.systemFont(ofSize: 16.0)

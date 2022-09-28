@@ -6,8 +6,7 @@
 import UIKit
 import NIMSDK
 
-public class TeamInfoViewController: NEBaseViewController, UITableViewDelegate,
-  UITableViewDataSource {
+public class TeamInfoViewController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
   let viewmodel = TeamInfoViewModel()
 
   var team: NIMTeam?
@@ -37,9 +36,9 @@ public class TeamInfoViewController: NEBaseViewController, UITableViewDelegate,
 
     // Do any additional setup after loading the view.
     if let type = team?.type, type == .normal {
-      title = localizable("discuss_info")
+      title = "讨论组信息"
     } else {
-      title = localizable("group_info")
+      title = "群信息"
     }
     viewmodel.getData(team)
     setupUI()
@@ -68,58 +67,58 @@ public class TeamInfoViewController: NEBaseViewController, UITableViewDelegate,
        // Pass the selected object to the new view controller.
    }
    */
-
-  // MARK: UITableViewDelegate, UITableViewDataSource
-
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewmodel.cellDatas.count
-  }
-
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let model = viewmodel.cellDatas[indexPath.row]
-    if let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(model.type)",
-      for: indexPath
-    ) as? BaseTeamSettingCell {
-      cell.configure(model)
-      return cell
+    //MARK: UITableViewDelegate, UITableViewDataSource
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      viewmodel.cellDatas.count
     }
-    return UITableViewCell()
-  }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    if indexPath.row == 0 {
-      let avatar = TeamAvatarViewController()
-      avatar.team = team
-      weak var weakSelf = self
-      avatar.block = {
-        if let t = weakSelf?.team {
-          weakSelf?.viewmodel.getData(t)
-          weakSelf?.contentTable.reloadData()
-        }
+    public func tableView(_ tableView: UITableView,
+                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      let model = viewmodel.cellDatas[indexPath.row]
+      if let cell = tableView.dequeueReusableCell(
+        withIdentifier: "\(model.type)",
+        for: indexPath
+      ) as? BaseTeamSettingCell {
+        cell.configure(model)
+        return cell
       }
-      navigationController?.pushViewController(avatar, animated: true)
-
-    } else if indexPath.row == 1 {
-      let nameController = TeamNameViewController()
-      nameController.team = team
-      navigationController?.pushViewController(nameController, animated: true)
-    } else if indexPath.row == 2 {
-      let intr = TeamIntroduceViewController()
-      intr.team = team
-      navigationController?.pushViewController(intr, animated: true)
+      return UITableViewCell()
     }
-  }
 
-  public func tableView(_ tableView: UITableView,
-                        heightForRowAt indexPath: IndexPath) -> CGFloat {
-    let model = viewmodel.cellDatas[indexPath.row]
-    return model.rowHeight
-  }
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+      if indexPath.row == 0 {
+        let avatar = TeamAvatarViewController()
+        avatar.team = team
+        weak var weakSelf = self
+        avatar.block = {
+          if let t = weakSelf?.team {
+            weakSelf?.viewmodel.getData(t)
+            weakSelf?.contentTable.reloadData()
+          }
+        }
+        navigationController?.pushViewController(avatar, animated: true)
 
-  public func tableView(_ tableView: UITableView,
-                        heightForHeaderInSection section: Int) -> CGFloat {
-    12.0
-  }
+      } else if indexPath.row == 1 {
+        let nameController = TeamNameViewController()
+        nameController.team = team
+        navigationController?.pushViewController(nameController, animated: true)
+      } else if indexPath.row == 2 {
+        let intr = TeamIntroduceViewController()
+        intr.team = team
+        navigationController?.pushViewController(intr, animated: true)
+      }
+    }
+
+    public func tableView(_ tableView: UITableView,
+                          heightForRowAt indexPath: IndexPath) -> CGFloat {
+      let model = viewmodel.cellDatas[indexPath.row]
+      return model.rowHeight
+    }
+
+    public func tableView(_ tableView: UITableView,
+                          heightForHeaderInSection section: Int) -> CGFloat {
+      12.0
+    }
+    
 }
+

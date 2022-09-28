@@ -30,7 +30,7 @@ public class UserSettingViewModel {
     weak var weakSelf = self
     let remind = UserSettingCellModel()
     remind.cellName = localizable("message_remind")
-    remind.cornerType = .topLeft.union(.topRight)
+      remind.cornerType = .none
     if let isNotiMsg = user.imUser?.notifyForNewMsg() {
       remind.switchOpen = isNotiMsg
     }
@@ -48,47 +48,12 @@ public class UserSettingViewModel {
       }
     }
 
-    let setTop = UserSettingCellModel()
-    setTop.cellName = localizable("session_set_top")
-    setTop.cornerType = .bottomRight.union(.bottomLeft)
+    let searchHistory = UserSettingCellModel()
+    searchHistory.cellName = "查找聊天内容"
 
-    if let uid = user.userId {
-      let session = NIMSession(uid, type: .P2P)
-      setTop.switchOpen = repo.isStickTop(session)
-    }
-
-    setTop.swichChange = { isOpen in
-      if let uid = weakSelf?.userInfo?.userId {
-        let session = NIMSession(uid, type: .P2P)
-        if isOpen {
-          let params = NIMAddStickTopSessionParams(session: session)
-          weakSelf?.repo.chatExtendProvider
-            .addStickTopSession(params: params) { error, info in
-              print("add stick : ", error as Any)
-              if let err = error {
-                weakSelf?.delegate?.didNeedRefreshUI()
-                weakSelf?.delegate?.didError(err)
-              } else {
-                setTop.switchOpen = false
-              }
-            }
-        } else {
-          if let info = weakSelf?.repo.chatExtendProvider.getTopSessionInfo(session) {
-            weakSelf?.repo.chatExtendProvider
-              .removeStickTopSession(params: info) { error, info in
-                print("remote stick : ", error as Any)
-                if let err = error {
-                  weakSelf?.delegate?.didNeedRefreshUI()
-                  weakSelf?.delegate?.didError(err)
-                } else {
-                  setTop.switchOpen = true
-                }
-              }
-          }
-        }
-      }
-    }
-
+      
+    let feedback = UserSettingCellModel()
+    feedback.cellName = "反馈"
     /*
      let blackList = UserSettingCellModel()
      blackList.cornerType = .bottomRight.union(.bottomLeft)
@@ -110,6 +75,6 @@ public class UserSettingViewModel {
          }
      }
      */
-    cellDatas.append(contentsOf: [remind, setTop])
+    cellDatas.append(contentsOf: [remind, searchHistory,feedback])
   }
 }

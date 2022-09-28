@@ -19,7 +19,7 @@ public class TeamListViewController: UIViewController, UITableViewDelegate, UITa
   }
 
   func commonUI() {
-    title = localizable("mine_groupchat")
+    title = "我的群聊"
     let image = UIImage.ne_imageNamed(name: "backArrow")?.withRenderingMode(.alwaysOriginal)
     navigationItem.leftBarButtonItem = UIBarButtonItem(
       image: image,

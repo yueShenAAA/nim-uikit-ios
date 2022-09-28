@@ -7,7 +7,8 @@ import UIKit
 
 class ChatAudioLeftCell: ChatBaseLeftCell, ChatAudioCell {
   var isPlaying: Bool = false
-  var audioImageView = UIImageView(image: UIImage.ne_imageNamed(name: "left_play_3"))
+//  var audioImageView = UIImageView(image: UIImage.ne_imageNamed(name: "left_play_3"))
+  var audioImageView = UIImageView(image:UIImage(named: "Frame 9"))
   var timeLabel = UILabel()
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -20,11 +21,12 @@ class ChatAudioLeftCell: ChatBaseLeftCell, ChatAudioCell {
   }
 
   func commonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     audioImageView.contentMode = .center
     audioImageView.translatesAutoresizingMaskIntoConstraints = false
     bubbleImage.addSubview(audioImageView)
     NSLayoutConstraint.activate([
-      audioImageView.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 16),
+      audioImageView.leftAnchor.constraint(equalTo: bubbleImage.leftAnchor, constant: 10),
       audioImageView.centerYAnchor.constraint(equalTo: bubbleImage.centerYAnchor),
       audioImageView.widthAnchor.constraint(equalToConstant: 28),
       audioImageView.heightAnchor.constraint(equalToConstant: 28),
@@ -36,17 +38,22 @@ class ChatAudioLeftCell: ChatBaseLeftCell, ChatAudioCell {
     timeLabel.translatesAutoresizingMaskIntoConstraints = false
     bubbleImage.addSubview(timeLabel)
     NSLayoutConstraint.activate([
-      timeLabel.leftAnchor.constraint(equalTo: audioImageView.rightAnchor, constant: 12),
+      timeLabel.leftAnchor.constraint(equalTo: audioImageView.rightAnchor, constant: 7),
       timeLabel.centerYAnchor.constraint(equalTo: bubbleImage.centerYAnchor),
       timeLabel.rightAnchor.constraint(equalTo: bubbleImage.rightAnchor, constant: -12),
       timeLabel.heightAnchor.constraint(equalToConstant: 28),
     ])
     audioImageView.animationDuration = 1
-    if let leftImage1 = UIImage.ne_imageNamed(name: "left_play_1"),
-       let leftmage2 = UIImage.ne_imageNamed(name: "left_play_2"),
-       let leftmage3 = UIImage.ne_imageNamed(name: "left_play_3") {
-      audioImageView.animationImages = [leftImage1, leftmage2, leftmage3]
-    }
+//    if let leftImage1 = UIImage.ne_imageNamed(name: "left_play_1"),
+//       let leftmage2 = UIImage.ne_imageNamed(name: "left_play_2"),
+//       let leftmage3 = UIImage.ne_imageNamed(name: "left_play_3") {
+//      audioImageView.animationImages = [leftImage1, leftmage2, leftmage3]
+//    }
+      if let leftImage1 = UIImage.init(named: "Frame 10"),
+         let leftmage2 = UIImage.init(named: "Frame 11"),
+         let leftmage3 = UIImage.init(named: "Frame 12") {
+        audioImageView.animationImages = [leftImage1, leftmage2, leftmage3]
+      }
   }
 
   func startAnimation() {
@@ -66,7 +73,7 @@ class ChatAudioLeftCell: ChatBaseLeftCell, ChatAudioCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let m = model as? MessageAudioModel {
-      timeLabel.text = "\(m.duration)" + "s"
+      timeLabel.text = "\(m.duration)" + "″"
       m.isPlaying ? startAnimation() : stopAnimation()
     }
   }

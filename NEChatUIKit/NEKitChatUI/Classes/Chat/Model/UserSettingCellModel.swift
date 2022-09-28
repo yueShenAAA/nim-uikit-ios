@@ -12,7 +12,7 @@ class UserSettingCellModel {
   var subTitle: String?
 //    var type = SettingCellType.SettingArrowCell.rawValue
   var swichChange: SwitchChangeCompletion?
-  var rowHeight: CGFloat = 49
+  var rowHeight: CGFloat = 56
   var cornerType = CornerType.none
 //    var headerUrl: String?
   var cellClick: CellClick?

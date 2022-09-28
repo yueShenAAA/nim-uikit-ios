@@ -62,6 +62,7 @@ class ChatVideoLeftCell: ChatImageLeftCell {
   }
 
   func setupUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     contentImageView.addSubview(stateView)
     contentImageView.addCustomCorner(conrners: [.topLeft], radius: 8, backcolor: .white)
     NSLayoutConstraint.activate([
@@ -81,9 +82,9 @@ class ChatVideoLeftCell: ChatImageLeftCell {
   override func setModel(_ model: MessageContentModel) {
     super.setModel(model)
     if let videoObject = model.message?.messageObject as? NIMVideoObject {
-      if let path = videoObject.coverUrl {
+      if let path = videoObject.coverPath {
         contentImageView.sd_setImage(
-          with: URL(string: path),
+          with: URL(fileURLWithPath: path),
           placeholderImage: nil,
           options: .retryFailed,
           progress: nil,

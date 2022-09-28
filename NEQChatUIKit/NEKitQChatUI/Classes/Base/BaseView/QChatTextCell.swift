@@ -31,7 +31,7 @@ class QChatTextCell: QChatStateCell {
       titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
     ])
-    titleLabel.text = localizable("delete")
+    titleLabel.text = "删除"
 
     detailLabel.font = UIFont.systemFont(ofSize: 16)
     detailLabel.translatesAutoresizingMaskIntoConstraints = false

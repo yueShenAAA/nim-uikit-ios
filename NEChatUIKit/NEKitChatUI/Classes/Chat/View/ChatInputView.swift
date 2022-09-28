@@ -13,6 +13,7 @@ public enum ChatMenuType {
   case emoji
   case image
   case file
+  case more
 }
 
 public protocol ChatInputViewDelegate: AnyObject {
@@ -28,21 +29,26 @@ public protocol ChatInputViewDelegate: AnyObject {
   func textFieldDidChange(_ textField: UITextView)
   func textFieldDidEndEditing(_ textField: UITextView)
   func textFieldDidBeginEditing(_ textField: UITextView)
+  func longPressClickEvent(sender:UILongPressGestureRecognizer)
 }
 
 public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
-  InputEmoticonContainerViewDelegate, UITextViewDelegate {
+  InputEmoticonContainerViewDelegate, UITextViewDelegate,ChatBottomMoreViewDelegate {
   public weak var delegate: ChatInputViewDelegate?
   public var currentType: ChatMenuType = .text
   public var menuHeight = 100.0
-  public var contentHeight = 204.0
+  public var contentHeight = 100.0
   public var atCache: NIMInputAtCache?
 
   var textField = RSKPlaceholderTextView()
   var contentView = UIView()
   public var contentSubView: UIView?
   private var greyView = UIView()
-  private var recordView = ChatRecordView(frame: .zero)
+  var recordView = ChatRecordView(frame: .zero)
+  var voiceButton = UIButton(type: .custom)
+  var mojiButton = UIButton(type: .custom)
+  var addButton = UIButton(type: .custom)
+  var pressOnSayButton = UIButton(type: .custom)
   override init(frame: CGRect) {
     super.init(frame: frame)
     commonUI()
@@ -57,22 +63,58 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
   }
 
   func commonUI() {
-    backgroundColor = UIColor(hexString: "#EFF1F3")
-    textField.layer.cornerRadius = 8
+    backgroundColor = UIColor(hexString: "#FFFFFF")
+      let lineV = UIView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 0.5))
+      lineV.backgroundColor = UIColor(hexString: "#FAFAF7")
+      addSubview(lineV)
+      voiceButton.setImage(UIImage(named: "Frame 9_1"), for: .normal)
+      voiceButton.setImage(UIImage(named: "Frame 13"), for: .selected)
+      voiceButton.translatesAutoresizingMaskIntoConstraints = false
+      voiceButton.addTarget(self, action: #selector(voiceClickEvent), for: .touchUpInside)
+      addSubview(voiceButton)
+      NSLayoutConstraint.activate([
+        voiceButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 21),
+        voiceButton.topAnchor.constraint(equalTo: topAnchor, constant: 13),
+        voiceButton.widthAnchor.constraint(equalToConstant: 28),
+        voiceButton.heightAnchor.constraint(equalToConstant: 28)
+      ])
+      
+      addButton.setImage(UIImage(named: "Group 708"), for: .normal)
+      addButton.translatesAutoresizingMaskIntoConstraints = false
+      addButton.addTarget(self, action: #selector(moreClickEvent), for: .touchUpInside)
+      addSubview(addButton)
+      NSLayoutConstraint.activate([
+        addButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -17),
+        addButton.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
+        addButton.widthAnchor.constraint(equalToConstant: 28),
+        addButton.heightAnchor.constraint(equalToConstant: 28)
+      ])
+      mojiButton.setImage(UIImage(named: "Slice 22"), for: .normal)
+      mojiButton.translatesAutoresizingMaskIntoConstraints = false
+      mojiButton.addTarget(self, action: #selector(mojiClickEvent), for: .touchUpInside)
+      addSubview(mojiButton)
+      NSLayoutConstraint.activate([
+        mojiButton.rightAnchor.constraint(equalTo: addButton.leftAnchor, constant: -14),
+        mojiButton.centerYAnchor.constraint(equalTo: addButton.centerYAnchor),
+        mojiButton.widthAnchor.constraint(equalToConstant: 28),
+        mojiButton.heightAnchor.constraint(equalToConstant: 28)
+      ])
+    textField.layer.cornerRadius = 4
     textField.clipsToBounds = true
     textField.translatesAutoresizingMaskIntoConstraints = false
-    textField.backgroundColor = .white
+    textField.backgroundColor = UIColor(hexString: "#F7F7F7")
     //        textField.leftViewMode = .always
     textField.returnKeyType = .send
     //        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 40))
     textField.delegate = self
     textField.allowsEditingTextAttributes = true
+      textField.font = UIFont(name: "PingFang SC", size: 14)
     addSubview(textField)
     NSLayoutConstraint.activate([
-      textField.leftAnchor.constraint(equalTo: leftAnchor, constant: 7),
-      textField.topAnchor.constraint(equalTo: topAnchor, constant: 6),
-      textField.rightAnchor.constraint(equalTo: rightAnchor, constant: -7),
-      textField.heightAnchor.constraint(equalToConstant: 40),
+        textField.leftAnchor.constraint(equalTo: voiceButton.rightAnchor, constant: 11),
+        textField.centerYAnchor.constraint(equalTo: voiceButton.centerYAnchor),
+        textField.rightAnchor.constraint(equalTo: mojiButton.leftAnchor, constant: -11),
+      textField.heightAnchor.constraint(equalToConstant: 36),
     ])
     NotificationCenter.default.addObserver(
       self,
@@ -80,51 +122,69 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       name: UITextField.textDidChangeNotification,
       object: nil
     )
+      
+      pressOnSayButton.layer.cornerRadius = 4
+      pressOnSayButton.clipsToBounds = true
+      pressOnSayButton.translatesAutoresizingMaskIntoConstraints = false
+      pressOnSayButton.backgroundColor = UIColor(hexString: "#F7F7F7")
+      pressOnSayButton.isHidden = true
+//      pressOnSayButton.addTarget(self, action: #selector(longPressOnClick), for: .touchUpInside)
+      pressOnSayButton.titleLabel?.font = UIFont(name: "PingFang SC", size: 14)
+      pressOnSayButton.setTitle("按住说话", for: .normal)
+      pressOnSayButton.setTitleColor(UIColor(hexString: "#808080"), for: .normal)
+      let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressOnClick))
+      pressOnSayButton.addGestureRecognizer(longPress)
+      addSubview(pressOnSayButton)
+      NSLayoutConstraint.activate([
+        pressOnSayButton.leftAnchor.constraint(equalTo: textField.leftAnchor, constant: 0),
+        pressOnSayButton.centerYAnchor.constraint(equalTo: textField.centerYAnchor),
+        pressOnSayButton.rightAnchor.constraint(equalTo: textField.rightAnchor, constant: 0),
+        pressOnSayButton.heightAnchor.constraint(equalTo: textField.heightAnchor),
+      ])
 
     //        let imageNames = ["mic","emoji","photo","file","add"]
-    let imageNames = ["mic", "emoji", "photo", "chat_video", "add"]
+//    let imageNames = ["mic", "emoji", "photo", "chat_video", "add"]
 
-    var items = [UIButton]()
-    for i in 0 ... 4 {
-      let button = UIButton(type: .custom)
-      button.setImage(UIImage.ne_imageNamed(name: imageNames[i]), for: .normal)
-      button.translatesAutoresizingMaskIntoConstraints = false
-      button.addTarget(self, action: #selector(buttonEvent), for: .touchUpInside)
-      button.tag = i + 5
-      items.append(button)
-      if i == 4 {
-        button.alpha = 0.5
-      }
-    }
-    let stackView = UIStackView(arrangedSubviews: items)
-    stackView.translatesAutoresizingMaskIntoConstraints = false
-    stackView.distribution = .fillEqually
-    addSubview(stackView)
-    NSLayoutConstraint.activate([
-      stackView.leftAnchor.constraint(equalTo: leftAnchor),
-      stackView.rightAnchor.constraint(equalTo: rightAnchor),
-      stackView.heightAnchor.constraint(equalToConstant: 54),
-      stackView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 0),
-    ])
+//    var items = [UIButton]()
+//    for i in 0 ... 4 {
+//      let button = UIButton(type: .custom)
+//      button.setImage(UIImage.ne_imageNamed(name: imageNames[i]), for: .normal)
+//      button.translatesAutoresizingMaskIntoConstraints = false
+//      button.addTarget(self, action: #selector(buttonEvent), for: .touchUpInside)
+//      button.tag = i + 5
+//      items.append(button)
+//      if i == 4 {
+//        button.alpha = 0.5
+//      }
+//    }
+//    let stackView = UIStackView(arrangedSubviews: items)
+//    stackView.translatesAutoresizingMaskIntoConstraints = false
+//    stackView.distribution = .fillEqually
+//    addSubview(stackView)
+//    NSLayoutConstraint.activate([
+//      stackView.leftAnchor.constraint(equalTo: leftAnchor),
+//      stackView.rightAnchor.constraint(equalTo: rightAnchor),
+//      stackView.heightAnchor.constraint(equalToConstant: 54),
+//      stackView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 0),
+//    ])
 
-    greyView.translatesAutoresizingMaskIntoConstraints = false
-    greyView.backgroundColor = UIColor(hexString: "#EFF1F3")
-    greyView.isHidden = true
-    addSubview(greyView)
-    NSLayoutConstraint.activate([
-      greyView.leftAnchor.constraint(equalTo: leftAnchor, constant: 0),
-      greyView.topAnchor.constraint(equalTo: topAnchor, constant: 0),
-      greyView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0),
-      greyView.heightAnchor.constraint(equalToConstant: 100),
-    ])
-
+//    greyView.translatesAutoresizingMaskIntoConstraints = false
+//    greyView.backgroundColor = UIColor(hexString: "#EFF1F3")
+//    greyView.isHidden = true
+//    addSubview(greyView)
+//    NSLayoutConstraint.activate([
+//      greyView.leftAnchor.constraint(equalTo: leftAnchor, constant: 0),
+//      greyView.topAnchor.constraint(equalTo: topAnchor, constant: 0),
+//      greyView.rightAnchor.constraint(equalTo: rightAnchor, constant: 0),
+//      greyView.heightAnchor.constraint(equalToConstant: 34),
+//    ])
     addSubview(contentView)
     contentView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       contentView.leftAnchor.constraint(equalTo: leftAnchor),
       contentView.rightAnchor.constraint(equalTo: rightAnchor),
       contentView.heightAnchor.constraint(equalToConstant: contentHeight),
-      contentView.topAnchor.constraint(equalTo: stackView.bottomAnchor, constant: 0),
+      contentView.topAnchor.constraint(equalTo:textField.bottomAnchor, constant: 0),
     ])
 
     recordView.isHidden = true
@@ -145,7 +205,12 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     //            emojiView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 0),
     //            emojiView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -25)
     //        ])
+    contentView.addSubview(moreView)
   }
+    
+    @objc func longPressOnClick(sender:UILongPressGestureRecognizer) {
+        delegate?.longPressClickEvent(sender: sender)
+    }
 
   func addRecordView() {
     if currentType != .audio {
@@ -155,6 +220,7 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       contentSubView = recordView
       contentSubView?.isHidden = false
     }
+      contentSubView?.isHidden = false
   }
 
   func addEmojiView() {
@@ -165,7 +231,19 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
       contentSubView = emojiView
       contentSubView?.isHidden = false
     }
+      contentSubView?.isHidden = false
   }
+    
+    func addMoreView() {
+        if currentType != .more {
+          currentType = .more
+          textField.resignFirstResponder()
+          contentSubView?.isHidden = true
+          contentSubView = moreView
+          contentSubView?.isHidden = false
+        }
+        contentSubView?.isHidden = false
+    }
 
   //    func doButtonDeleteText(){
   //        let range = delRangeForLastComponent()
@@ -231,22 +309,49 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     view.delegate = self
     return view
   }()
+    
+  lazy var moreView: ChatBottomMoreView = {
+        let view =
+        ChatBottomMoreView(frame: CGRect(x: 0, y: 0, width: kScreenWidth, height: 56))
+        //        view.translatesAutoresizingMaskIntoConstraints = false
+        view.delegate = self
+        view.isHidden = true
+        return view
+    }()
 
   public func textViewDidEndEditing(_ textView: UITextView) {
     delegate?.textFieldDidEndEditing(textView)
+  }
+
+  public func textFieldDidEndEditing(_ textField: UITextField) {
+    //        delegate?.textFieldDidEndEditing(textField)
   }
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
     delegate?.textFieldDidBeginEditing(textView)
   }
 
+  public func textFieldDidBeginEditing(_ textField: UITextField) {
+    //        delegate?.textFieldDidBeginEditing(textField)
+  }
+
   public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+      if currentType == .more{
+          moreView.isHidden = true
+      }
+      if currentType == .emoji{
+          emojiView.isHidden = true
+      }
+      if currentType == .audio{
+          recordView.isHidden = true
+      }
     currentType = .text
     return true
   }
 
   public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
     currentType = .text
+      
     return true
   }
 
@@ -296,7 +401,37 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     }
     return true
   }
-
+    
+    @objc func mojiClickEvent(button: UIButton) {
+        addEmojiView()
+        delegate?.willSelectItem(button: button, index: 1)
+        pressOnSayButton.isHidden = true
+        textField.isHidden = false
+        voiceButton.isSelected = false
+    }
+    @objc func voiceClickEvent(button: UIButton) {
+        button.isSelected = !button.isSelected
+        if button.isSelected {
+            //按住说话
+            pressOnSayButton.isHidden = false
+            textField.isHidden = true
+            textField.resignFirstResponder()
+            contentSubView?.isHidden = true
+            delegate?.willSelectItem(button: button, index: 6)
+        }else{
+            pressOnSayButton.isHidden = true
+            textField.isHidden = false
+            textField.becomeFirstResponder()
+        }
+//        addRecordView()
+//        delegate?.willSelectItem(button: button, index: 0)
+    }
+    
+    @objc func moreClickEvent(button: UIButton) {
+        addMoreView()
+        delegate?.willSelectItem(button: button, index: 5)
+    }
+    
   @objc func buttonEvent(button: UIButton) {
     switch button.tag - 5 {
     case 0:
@@ -405,4 +540,9 @@ public class ChatInputView: UIView, UITextFieldDelegate, ChatRecordViewDelegate,
     }
     return muta as String
   }
+//    MARK: ChatBottomMoreViewDelegate
+
+    func selectItem(tag: Int,button:UIButton) {
+        delegate?.willSelectItem(button: button, index: tag + 2)
+    }
 }

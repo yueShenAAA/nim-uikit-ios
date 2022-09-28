@@ -18,6 +18,7 @@ class ChatImageLeftCell: ChatBaseLeftCell {
   }
 
   func commonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     contentImageView.translatesAutoresizingMaskIntoConstraints = false
     contentImageView.contentMode = .scaleAspectFill
     contentImageView.clipsToBounds = true

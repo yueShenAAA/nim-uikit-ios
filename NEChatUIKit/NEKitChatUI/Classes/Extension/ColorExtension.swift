@@ -9,12 +9,14 @@ public extension UIColor {
 //    MARK: text color
 
   static let ne_darkText = UIColor(hexString: "#333333")
+  static let ne_darkNameText = UIColor(hexString: "#0D0D0D")
   static let ne_greyText = UIColor(hexString: "#666666")
   static let ne_lightText = UIColor(hexString: "#999999")
   static let ne_blueText = UIColor(hexString: "#337EFF")
   static let ne_redText = UIColor(hexString: "#E6605C")
   static let ne_disableRedText = UIColor(hexString: "#E6605C", 0.5)
-  static let ne_backcolor = UIColor(hexString: "F2F4F5")
+//  static let ne_backcolor = UIColor(hexString: "F2F4F5")#FAFAF7
+  static let ne_backcolor = UIColor(hexString: "#FAFAF7")
   static let ne_emptyTitleColor = UIColor(hexString: "B3B7BC")
   static let ne_greenText = UIColor(hexString: "3EAF96")
 

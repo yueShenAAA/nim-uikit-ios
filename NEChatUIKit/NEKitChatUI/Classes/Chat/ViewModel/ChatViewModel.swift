@@ -94,6 +94,14 @@ public class ChatViewModel: NSObject, ChatRepoMessageDelegate, NIMChatManagerDel
       completion
     )
   }
+    
+    public func sendLocationMessage(latitude:Double,longitude:Double,title:String, _ completion: @escaping (Error?) -> Void) {
+      repo.sendMessage(
+        message: MessageUtils.locationMessage(latitude: latitude, longitude: longitude, title: title),
+        session: session,
+        completion
+      )
+    }
 
   public func sendImageMessage(image: UIImage, _ completion: @escaping (Error?) -> Void) {
     // TODO:

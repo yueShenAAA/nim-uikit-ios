@@ -6,8 +6,7 @@
 import UIKit
 import NIMSDK
 
-public class TeamHistoryMessageController: NEBaseViewController, UITextFieldDelegate,
-  UITableViewDelegate, UITableViewDataSource {
+public class TeamHistoryMessageController: NEBaseViewController,UITextFieldDelegate,UITableViewDelegate, UITableViewDataSource {
   private let viewmodel = TeamSettingViewModel()
   private var teamSession: NIMSession?
   private var searchStr = ""
@@ -59,7 +58,7 @@ public class TeamHistoryMessageController: NEBaseViewController, UITextFieldDele
   }
 
   func initialConfig() {
-    title = localizable("historical_record")
+    title = "历史记录"
   }
 
   // MARK: lazy method
@@ -87,7 +86,7 @@ public class TeamHistoryMessageController: NEBaseViewController, UITextFieldDele
     textField.contentMode = .center
     textField.leftView = leftImageView
     textField.leftViewMode = .always
-    textField.placeholder = localizable("search")
+    textField.placeholder = localizable("搜索")
     textField.font = UIFont.systemFont(ofSize: 14)
     textField.textColor = UIColor.ne_greyText
     textField.translatesAutoresizingMaskIntoConstraints = false
@@ -102,11 +101,7 @@ public class TeamHistoryMessageController: NEBaseViewController, UITextFieldDele
   }()
 
   private lazy var emptyView: NEEmptyDataView = {
-    let view = NEEmptyDataView(
-      imageName: "emptyView",
-      content: localizable("no_search_results"),
-      frame: CGRect.zero
-    )
+    let view = NEEmptyDataView(imageName: "emptyView", content: "暂无搜索结果", frame: CGRect.zero)
     view.translatesAutoresizingMaskIntoConstraints = false
     view.isHidden = true
     return view
@@ -121,73 +116,75 @@ public class TeamHistoryMessageController: NEBaseViewController, UITextFieldDele
       tableView.reloadData()
     }
   }
-
-  // MARK: UITextFieldDelegate
-
-  public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    guard let searchText = textField.text else {
-      return false
-    }
-    if searchText.count <= 0 {
-      return false
-    }
-    guard let session = teamSession else {
-      return false
-    }
-    weak var weakSelf = self
-    searchStr = searchText
-    let option = NIMMessageSearchOption()
-    option.searchContent = searchText
-    weakSelf?.viewmodel.searchMessages(session, option: option) { error, messages in
-      if error == nil {
-        if let msg = messages, msg.count > 0 {
-          weakSelf?.emptyView.isHidden = true
+    
+    //MARK: UITextFieldDelegate
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+      guard let searchText = textField.text else {
+        return false
+      }
+      if searchText.count <= 0 {
+        return false
+      }
+      guard let session = teamSession else {
+        return false
+      }
+      weak var weakSelf = self
+      searchStr = searchText
+      let option = NIMMessageSearchOption()
+      option.searchContent = searchText
+      weakSelf?.viewmodel.searchMessages(session, option: option) { error, messages in
+        if error == nil {
+          if let msg = messages, msg.count > 0 {
+            weakSelf?.emptyView.isHidden = true
+          } else {
+            weakSelf?.emptyView.isHidden = false
+          }
+          weakSelf?.tableView.reloadData()
         } else {
-          weakSelf?.emptyView.isHidden = false
+          NELog.errorLog(
+            weakSelf?.tag ?? "TeamHistoryMessageController",
+            desc: "❌searchMessages failed, error = \(error!)"
+          )
         }
-        weakSelf?.tableView.reloadData()
-      } else {
-        NELog.errorLog(
-          weakSelf?.tag ?? "TeamHistoryMessageController",
-          desc: "❌searchMessages failed, error = \(error!)"
-        )
       }
+
+      return true
+    }
+    
+    //MARK: UITableViewDelegate, UITableViewDataSource
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      viewmodel.searchResultInfos?.count ?? 0
     }
 
-    return true
-  }
+    public func tableView(_ tableView: UITableView,
+                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      let cell = tableView.dequeueReusableCell(
+        withIdentifier: "\(NSStringFromClass(HistoryMessageCell.self))",
+        for: indexPath
+      ) as! HistoryMessageCell
+      let cellModel = viewmodel.searchResultInfos?[indexPath.row]
+      cell.searchText = searchStr
+      cell.configData(message: cellModel)
+      return cell
+    }
 
-  // MARK: UITableViewDelegate, UITableViewDataSource
-
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    viewmodel.searchResultInfos?.count ?? 0
-  }
-
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(NSStringFromClass(HistoryMessageCell.self))",
-      for: indexPath
-    ) as! HistoryMessageCell
-    let cellModel = viewmodel.searchResultInfos?[indexPath.row]
-    cell.searchText = searchStr
-    cell.configData(message: cellModel)
-    return cell
-  }
-
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let cellModel = viewmodel.searchResultInfos?[indexPath.row]
-    if cellModel?.imMessage?.session?.sessionType == .team {
-      if let sid = cellModel?.imMessage?.session?.sessionId,
-         let message = cellModel?.imMessage {
-        let session = NIMSession(sid, type: .team)
-        Router.shared.use(
-          PushTeamChatVCRouter,
-          parameters: ["nav": navigationController as Any, "session": session as Any,
-                       "anchor": message],
-          closure: nil
-        )
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+      let cellModel = viewmodel.searchResultInfos?[indexPath.row]
+      if cellModel?.imMessage?.session?.sessionType == .team {
+        if let sid = cellModel?.imMessage?.session?.sessionId,
+           let message = cellModel?.imMessage {
+          let session = NIMSession(sid, type: .team)
+          Router.shared.use(
+            PushTeamChatVCRouter,
+            parameters: ["nav": navigationController as Any, "session": session as Any,
+                         "anchor": message],
+            closure: nil
+          )
+        }
       }
     }
-  }
 }
+
+
+
+

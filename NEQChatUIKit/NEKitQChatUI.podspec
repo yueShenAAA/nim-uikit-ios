@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'NEKitQChatUI'
-  s.version          = '9.2.8'
+  s.version          = '9.2.7'
   s.summary          = 'Netease XKit'
 
 # This description is used to generate tags and improve search results.
@@ -35,6 +35,7 @@ TODO: Add long description of the pod here.
   s.resource_bundles = {
     'NEKitQChatUI' => ['NEKitQChatUI/Assets/*.png']
   }
+  
   s.resource = 'NEKitQChatUI/Assets/**/*'
   s.dependency 'NECommonUIKit'
   s.dependency 'NEQChatKit'

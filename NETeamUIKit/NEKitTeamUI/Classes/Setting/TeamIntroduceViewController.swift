@@ -8,7 +8,7 @@ import NEKitCommon
 import NIMSDK
 import NEKitTeam
 
-public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelegate {
+public class TeamIntroduceViewController: NEBaseViewController,UITextViewDelegate {
 //    typealias SaveCompletion = () -> Void
 //
 //    var block: SaveCompletion?
@@ -44,12 +44,12 @@ public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelega
   }
 
   func setupUI() {
-    addRightAction(localizable("save"), #selector(saveIntr), self)
+    addRightAction("保存", #selector(saveIntr), self)
 
     if let type = team?.type, type == .advanced {
-      title = localizable("team_intr")
+      title = "群介绍"
     } else {
-      title = localizable("discuss_introduce")
+      title = "讨论组介绍"
     }
 
     view.backgroundColor = NEConstant.hexRGB(0xF1F1F6)
@@ -127,7 +127,7 @@ public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelega
    */
 
   func changePermission() -> Bool {
-    if let ownerId = team?.owner, IMKitEngine.instance.isMySelf(ownerId) {
+    if let ownerId = team?.owner, IMKitLoginManager.instance.isMySelf(ownerId) {
       return true
     }
     if let mode = team?.updateInfoMode, mode == .all {
@@ -135,50 +135,49 @@ public class TeamIntroduceViewController: NEBaseViewController, UITextViewDelega
     }
     return false
   }
-
-  @objc func saveIntr() {
-    textView.resignFirstResponder()
-    if let teamid = team?.teamId {
-      let text = textView.text ?? ""
-      weak var weakSelf = self
-      view.makeToastActivity(.center)
-      repo.updateTeamIntroduce(text, teamid) { error in
-        weakSelf?.view.hideToastActivity()
-        if let err = error {
-          weakSelf?.showToast(err.localizedDescription)
-        } else {
-          weakSelf?.team?.intro = text
-          weakSelf?.navigationController?.popViewController(animated: true)
+    
+    @objc func saveIntr() {
+      textView.resignFirstResponder()
+      if let teamid = team?.teamId {
+        let text = textView.text ?? ""
+        weak var weakSelf = self
+        view.makeToastActivity(.center)
+        repo.updateTeamIntroduce(text, teamid) { error in
+          weakSelf?.view.hideToastActivity()
+          if let err = error {
+            weakSelf?.showToast(err.localizedDescription)
+          } else {
+            weakSelf?.team?.intro = text
+            weakSelf?.navigationController?.popViewController(animated: true)
+          }
         }
       }
     }
-  }
+    //MARK: UITextViewDelegate
+    public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
+                         replacementText text: String) -> Bool {
+      let currentText = textView.text ?? ""
+      guard let stringRange = Range(range, in: currentText) else { return false }
+      let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
+      return updatedText.count <= 100
+    }
 
-  // MARK: UITextViewDelegate
-
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
-                       replacementText text: String) -> Bool {
-    let currentText = textView.text ?? ""
-    guard let stringRange = Range(range, in: currentText) else { return false }
-    let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
-    return updatedText.count <= 100
-  }
-
-  public func textViewDidChange(_ textView: UITextView) {
-    if var text = textView.text {
-      if let lang = textView.textInputMode?.primaryLanguage, lang == "zh-Hans",
-         let selectRange = textView.markedTextRange {
-        let position = textView.position(from: selectRange.start, offset: 0)
-        if position == nil {
-          if text.count > 30 {
-            text = String(text.prefix(30))
-            textView.text = String(text.prefix(30))
+    public func textViewDidChange(_ textView: UITextView) {
+      if var text = textView.text {
+        if let lang = textView.textInputMode?.primaryLanguage, lang == "zh-Hans",
+           let selectRange = textView.markedTextRange {
+          let position = textView.position(from: selectRange.start, offset: 0)
+          if position == nil {
+            if text.count > 30 {
+              text = String(text.prefix(30))
+              textView.text = String(text.prefix(30))
+            }
+            countLabel.text = "\(text.count)/100"
           }
+        } else {
           countLabel.text = "\(text.count)/100"
         }
-      } else {
-        countLabel.text = "\(text.count)/100"
       }
     }
-  }
 }
+

@@ -18,6 +18,7 @@ class ChatImageRightCell: ChatBaseRightCell {
   }
 
   func commonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     contentImageView.translatesAutoresizingMaskIntoConstraints = false
     contentImageView.contentMode = .scaleAspectFill
     contentImageView.addCustomCorner(

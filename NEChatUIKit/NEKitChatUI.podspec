@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "NEKitChatUI"
-  spec.version      = "9.2.8"
+  spec.version      = "9.2.7"
   spec.summary      = "Chat Module of IM."
 
   # This description is used to generate tags and improve search results.
@@ -38,6 +38,7 @@ TODO: Add long description of the pod here.
       'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES'
     }
   spec.user_target_xcconfig = { 'BUILD_LIBRARY_FOR_DISTRIBUTION' => 'YES' }
+  
   spec.resource_bundles = {
     'NEKitChatUI' => ['NEKitChatUI/Assets/*.png']
   }

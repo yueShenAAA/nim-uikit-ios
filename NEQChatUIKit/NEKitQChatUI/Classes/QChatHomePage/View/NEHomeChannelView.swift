@@ -113,7 +113,7 @@ class NEHomeChannelView: UIView {
       }
     case .updateChannelCategoryBlackWhiteRole:
       if noticeInfo.serverId == qchatServerModel?.serverId,
-         (noticeInfo.toAccids?.contains(IMKitEngine.instance.imAccid)) != nil {
+         (noticeInfo.toAccids?.contains(IMKitLoginManager.instance.imAccid)) != nil {
         requestData(timeTag: 0)
       }
 
@@ -151,7 +151,7 @@ class NEHomeChannelView: UIView {
   private lazy var subTitleLable: UILabel = {
     let title = UILabel()
     title.translatesAutoresizingMaskIntoConstraints = false
-    title.text = localizable("message_channel")
+    title.text = "消息频道"
     title.textColor = PlaceholderTextColor
     title.font = DefaultTextFont(14)
     return title
@@ -189,7 +189,7 @@ class NEHomeChannelView: UIView {
   private lazy var emptyView: EmptyDataView = {
     let view = EmptyDataView(
       imageName: "channel_noMoreData",
-      content: localizable("server_nochannel"),
+      content: "该服务器下暂无频道",
       frame: tableView.bounds
     )
     view.translatesAutoresizingMaskIntoConstraints = false
@@ -231,7 +231,7 @@ extension NEHomeChannelView {
           self.channelArray.removeAll()
           self.channelArray = dataArray
           if dataArray.isEmpty {
-            emptyView.setttingContent(content: localizable("server_nochannel"))
+            emptyView.setttingContent(content: "该服务器下暂无频道")
             emptyView.setEmptyImage(name: "channel_noMoreData")
             emptyView.isHidden = false
           } else {
@@ -257,7 +257,7 @@ extension NEHomeChannelView {
     subTitleLable.isHidden = true
     addChannelBtn.isHidden = true
     emptyView.isHidden = false
-    emptyView.setttingContent(content: localizable("add_favorite_service"))
+    emptyView.setttingContent(content: "暂无服务器，\n赶紧去添加心仪的服务器吧")
     emptyView.setEmptyImage(name: "servers_noMore")
   }
 

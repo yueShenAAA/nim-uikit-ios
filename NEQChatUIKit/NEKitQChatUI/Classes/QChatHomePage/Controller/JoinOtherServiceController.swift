@@ -9,8 +9,7 @@ import NEKitCoreIM
 import NEKitCommon
 import IQKeyboardManagerSwift
 
-public class JoinOtherServiceController: NEBaseViewController, UITableViewDelegate,
-  UITableViewDataSource {
+public class JoinOtherServiceController: NEBaseViewController,UITableViewDelegate, UITableViewDataSource {
   private let tag = "JoinOtherServiceController"
   public var serversArray = [QChatServer]()
   public var serverViewModel = CreateServerViewModel()
@@ -66,7 +65,7 @@ public class JoinOtherServiceController: NEBaseViewController, UITableViewDelega
     textField.contentMode = .center
     textField.leftView = leftImageView
     textField.leftViewMode = .always
-    textField.placeholder = localizable("search_serverId")
+    textField.placeholder = localizable("搜索服务器ID")
     textField.font = DefaultTextFont(14)
     textField.textColor = TextNormalColor
     textField.translatesAutoresizingMaskIntoConstraints = false
@@ -96,99 +95,99 @@ public class JoinOtherServiceController: NEBaseViewController, UITableViewDelega
   private lazy var emptyView: EmptyDataView = {
     let view = EmptyDataView(
       imageName: "searchServer_noMoreData",
-      content: localizable("no_serverId"),
+      content: "暂无你要的服务器ID",
       frame: tableView.bounds
     )
     return view
   }()
+    
+    @objc func searchTextFieldChange(textfield: SearchTextField) {
+      // 选择高亮文本在进行搜索
+  //         let textRange = textfield.markedTextRange
+  //         if textRange == nil || ((textRange?.isEmpty) == nil) {
+  //             print("111")
+  //         }
 
-  @objc func searchTextFieldChange(textfield: SearchTextField) {
-    // 选择高亮文本在进行搜索
-    //         let textRange = textfield.markedTextRange
-    //         if textRange == nil || ((textRange?.isEmpty) == nil) {
-    //             print("111")
-    //         }
+      if !NEChatDetectNetworkTool.shareInstance.isNetworkRecahability() {
+        showToast("当前网络错误")
+        return
+      }
 
-    if !NEChatDetectNetworkTool.shareInstance.isNetworkRecahability() {
-      showToast(localizable("network_error"))
-      return
-    }
+      guard let content = textfield.text else {
+        return
+      }
+      // 空字符串判断
+      if content.isBlank {
+        emptyView.removeFromSuperview()
+        return
+      }
 
-    guard let content = textfield.text else {
-      return
-    }
-    // 空字符串判断
-    if content.isBlank {
-      emptyView.removeFromSuperview()
-      return
-    }
-
-    let param = QChatGetServersParam(serverIds: [NSNumber(value: UInt64(content)!)])
-    serverViewModel.getServers(parameter: param) { error, serversArray in
-      if error == nil {
-        self.serversArray = serversArray?.servers ?? Array()
-        if self.serversArray.isEmpty {
-          self.tableView.addSubview(self.emptyView)
-          return
+      let param = QChatGetServersParam(serverIds: [NSNumber(value: UInt64(content)!)])
+      serverViewModel.getServers(parameter: param) { error, serversArray in
+        if error == nil {
+          self.serversArray = serversArray?.servers ?? Array()
+          if self.serversArray.isEmpty {
+            self.tableView.addSubview(self.emptyView)
+            return
+          } else {
+            self.emptyView.removeFromSuperview()
+          }
+          self.tableView.reloadData()
         } else {
-          self.emptyView.removeFromSuperview()
+          NELog.errorLog(self.tag, desc: "❌getServers failed,error = \(error!)")
         }
-        self.tableView.reloadData()
-      } else {
-        NELog.errorLog(self.tag, desc: "❌getServers failed,error = \(error!)")
       }
     }
-  }
-
-  // MARK: UITableViewDelegate  UITableViewDataSource
-
-  public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    serversArray.count
-  }
-
-  public func tableView(_ tableView: UITableView,
-                        cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(
-      withIdentifier: "\(NSStringFromClass(NESearchServerCell.self))",
-      for: indexPath
-    ) as! NESearchServerCell
-    cell.serverModel = serversArray[indexPath.row]
-    weak var weakSelf = self
-    cell.joinServerCallBack = {
-      let successView =
-        InviteMemberView(frame: CGRect(x: (kScreenWidth - 176) / 2, y: KStatusBarHeight,
-                                       width: 176, height: 55))
-      successView.showSuccessView()
+    
+    // MARK: UITableViewDelegate  UITableViewDataSource
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+      serversArray.count
     }
-    return cell
-  }
 
-  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let serverId = serversArray[indexPath.row].serverId else { return }
-    let param = QChatGetChannelsByPageParam(timeTag: 0, serverId: serverId)
-    weak var weakSelf = self
-    channelViewModel.getChannelsByPage(parameter: param) { error, result in
-      if error == nil {
-        guard let dataArray = result?.channels else { return }
-        let chatVC = QChatViewController(channel: dataArray.first)
-        weakSelf?.navigationController?.pushViewController(chatVC, animated: true)
-      } else {
-        print("getChannelsByPage failed,error = \(error!)")
+    public func tableView(_ tableView: UITableView,
+                          cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+      let cell = tableView.dequeueReusableCell(
+        withIdentifier: "\(NSStringFromClass(NESearchServerCell.self))",
+        for: indexPath
+      ) as! NESearchServerCell
+      cell.serverModel = serversArray[indexPath.row]
+      weak var weakSelf = self
+      cell.joinServerCallBack = {
+        let successView =
+          InviteMemberView(frame: CGRect(x: (kScreenWidth - 176) / 2, y: KStatusBarHeight,
+                                         width: 176, height: 55))
+        successView.showSuccessView()
+      }
+      return cell
+    }
+
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+      guard let serverId = serversArray[indexPath.row].serverId else { return }
+      let param = QChatGetChannelsByPageParam(timeTag: 0, serverId: serverId)
+      weak var weakSelf = self
+      channelViewModel.getChannelsByPage(parameter: param) { error, result in
+        if error == nil {
+          guard let dataArray = result?.channels else { return }
+          let chatVC = QChatViewController(channel: dataArray.first)
+          weakSelf?.navigationController?.pushViewController(chatVC, animated: true)
+        } else {
+          print("getChannelsByPage failed,error = \(error!)")
+        }
       }
     }
-  }
 }
+
 
 // MARK: private Method
 
 extension JoinOtherServiceController {
   func showAlert() {
     let alertCtrl = UIAlertController(
-      title: localizable("cant_join"),
-      message: localizable("blocked_from_server_cant_join"),
+      title: localizable("无法加入？"),
+      message: localizable("你被该服务器封禁，无法加入。"),
       preferredStyle: .alert
     )
-    let okAction = UIAlertAction(title: localizable("know"), style: .default, handler: nil)
+    let okAction = UIAlertAction(title: localizable("知道了"), style: .default, handler: nil)
     alertCtrl.addAction(okAction)
     present(alertCtrl, animated: true, completion: nil)
   }

@@ -19,7 +19,8 @@ open class ContactBaseViewController: UIViewController {
   private func setupBackUI() {
     navigationController?.navigationBar.tintColor = .white
     let backItem = UIBarButtonItem(
-      image: UIImage.ne_imageNamed(name: "backArrow"),
+//      image: UIImage.ne_imageNamed(name: "backArrow"),
+      image: UIImage(named: "返回箭头"),
       style: .plain,
       target: self,
       action: #selector(backToPrevious)

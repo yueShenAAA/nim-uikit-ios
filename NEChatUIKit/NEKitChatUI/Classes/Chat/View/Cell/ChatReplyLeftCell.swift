@@ -18,6 +18,7 @@ class ChatReplyLeftCell: ChatBaseLeftCell {
   }
 
   func commonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     replyLabel.font = UIFont.systemFont(ofSize: 12)
     replyLabel.textColor = UIColor(hexString: "#929299")
     replyLabel.translatesAutoresizingMaskIntoConstraints = false

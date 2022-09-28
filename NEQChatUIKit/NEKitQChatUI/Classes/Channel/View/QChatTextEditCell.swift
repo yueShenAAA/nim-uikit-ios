@@ -5,11 +5,12 @@
 
 import UIKit
 
-@objc protocol QChatTextEditCellDelegate: AnyObject {
+@objc protocol QChatTextEditCellDelegate:AnyObject {
 //  @objc optional func textFieldDidChangeSelection(cell: QChatTextEditCell,
 //                                                  _ textField: UITextField)
   @objc optional func textDidChange(_ textField: UITextField)
 }
+
 
 class QChatTextEditCell: QChatCornerCell, UITextFieldDelegate {
   var limit: Int?

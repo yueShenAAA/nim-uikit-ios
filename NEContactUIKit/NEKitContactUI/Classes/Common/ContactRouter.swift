@@ -8,8 +8,7 @@ import NEKitCore
 import NEKitCoreIM
 import NIMSDK
 
-@objcMembers
-public class ContactRouter:NSObject {
+public enum ContactRouter {
   public static func register() {
     Router.shared.register(ContactUserSelectRouter) { param in
       print("param:\(param)")
@@ -20,9 +19,6 @@ public class ContactRouter:NSObject {
       }
       if let limit = param["limit"] as? Int, limit > 0 {
         contactSelectVC.limit = limit
-      }
-      if let uid = param["uid"] as? String {
-        contactSelectVC.userId = uid
       }
       nav?.pushViewController(contactSelectVC, animated: true)
     }

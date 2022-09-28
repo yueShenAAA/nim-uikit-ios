@@ -69,6 +69,7 @@ class ChatVideoRightCell: ChatImageRightCell {
   }
 
   func setupUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     contentImageView.addSubview(stateView)
     contentImageView.addCustomCorner(conrners: [.topRight], radius: 8, backcolor: .white)
     NSLayoutConstraint.activate([

@@ -7,8 +7,7 @@ import Foundation
 import NIMSDK
 import NEKitCommon
 
-@objcMembers
-public class ChatRouter:NSObject {
+public enum ChatRouter {
   public static func register() {
     // p2p
     Router.shared.register(PushP2pChatVCRouter) { param in

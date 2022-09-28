@@ -7,6 +7,7 @@ import UIKit
 
 @objc public protocol InputEmoticonTabViewDelegate: AnyObject {
   @objc optional func tabView(_ tabView: InputEmoticonTabView?, didSelectTabIndex index: Int)
+  @objc optional func sendEmoji()
 }
 
 public class InputEmoticonTabView: UIControl {
@@ -76,16 +77,21 @@ public class InputEmoticonTabView: UIControl {
       delegate?.tabView?(self, didSelectTabIndex: index)
     }
   }
+    
+    @objc func sendEmoji(sender: UIButton) {
+      
+    }
 
   // MARK: lazy method
 
   public lazy var sendButton: UIButton = {
     let button = UIButton()
     button.translatesAutoresizingMaskIntoConstraints = false
-    button.setTitle(localizable("send"), for: .normal)
+    button.setTitle("发送", for: .normal)
     button.titleLabel?.textColor = .white
     button.backgroundColor = UIColor.ne_blueText
     button.titleLabel?.font = DefaultTextFont(14)
+    button.addTarget(self, action: #selector(sendEmoji), for: .touchUpInside)
     return button
   }()
 }

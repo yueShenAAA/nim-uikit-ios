@@ -22,7 +22,7 @@ public class SettingCellModel {
   public var subTitle: String?
   public var type = SettingCellType.SettingArrowCell.rawValue
   public var swichChange: SwitchChangeCompletion?
-  public var rowHeight: CGFloat = 49
+  public var rowHeight: CGFloat = 56
   public var cornerType = CornerType.none
   public var headerUrl: String?
   public var cellClick: CellClick?

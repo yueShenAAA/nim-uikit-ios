@@ -10,9 +10,13 @@ import NIMSDK
 open class P2PChatViewController: ChatViewController {
   override open func viewDidLoad() {
     super.viewDidLoad()
-
     // Do any additional setup after loading the view.
   }
+ 
+    public override func pushLocationVC() {
+        super.pushLocationVC()
+        
+    }
 
   override open func getSessionInfo(session: NIMSession) {
     viewmodel.getUserInfo(userId: session.sessionId)
@@ -20,7 +24,9 @@ open class P2PChatViewController: ChatViewController {
     let title = user?.showName() ?? ""
     self.title = title
     titleContent = title
-    menuView.textField.placeholder = localizable("send_to") + title as NSString
+    // self.menuView.textField.placeholder = localizable("send_to") + title
+//    menuView.textField.placeholder = localizable("send_to") + title as NSString
+      menuView.textField.placeholder = "输入聊天内容";
   }
 
   /// 创建个人聊天页构造方法

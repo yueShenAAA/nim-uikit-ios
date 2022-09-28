@@ -18,4 +18,20 @@ public class ChatBaseCell: UITableViewCell {
   public func uploadProgress(_ progress: Float) {
     fatalError("override in sub class")
   }
+    
+  public override func setSelected(_ selected: Bool, animated: Bool) {
+            super.setSelected(selected, animated: animated)
+         
+            // Configure the view for the selected state
+         
+            if selected {
+                self.backgroundColor = UIColor(hexString: "#FAFAF7")
+                contentView.backgroundColor = UIColor(hexString: "#FAFAF7")
+                backgroundView?.backgroundColor = UIColor(hexString: "#FAFAF7")
+            }else {
+                self.backgroundColor = UIColor(hexString: "#FAFAF7")
+                contentView.backgroundColor = UIColor(hexString: "#FAFAF7")
+                backgroundView?.backgroundColor = UIColor(hexString: "#FAFAF7")
+            }
+}
 }

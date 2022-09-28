@@ -27,6 +27,7 @@ class UserSettingSwitchCell: UserSettingBaseCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
+    showDefaultLine = false
     setupUI()
   }
 
@@ -44,7 +45,7 @@ class UserSettingSwitchCell: UserSettingBaseCell {
   func setupUI() {
     contentView.addSubview(titleLabel)
     NSLayoutConstraint.activate([
-      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 36),
+      titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 16),
       titleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
       titleLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -84),
     ])
@@ -52,7 +53,7 @@ class UserSettingSwitchCell: UserSettingBaseCell {
     contentView.addSubview(tSwitch)
     NSLayoutConstraint.activate([
       tSwitch.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-      tSwitch.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -36),
+      tSwitch.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -16),
     ])
     tSwitch.addTarget(self, action: #selector(switchChange(_:)), for: .touchUpInside)
   }

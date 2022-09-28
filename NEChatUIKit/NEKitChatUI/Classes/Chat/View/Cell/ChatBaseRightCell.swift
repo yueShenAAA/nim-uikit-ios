@@ -47,7 +47,6 @@ class ChatBaseRightCell: ChatBaseCell {
   func baseCommonUI() {
     // avatar
     selectionStyle = .none
-    backgroundColor = .white
     avatarImage.layer.cornerRadius = 16
     avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
     avatarImage.translatesAutoresizingMaskIntoConstraints = false
@@ -76,6 +75,7 @@ class ChatBaseRightCell: ChatBaseCell {
     ])
 
 //        bubbleImage
+    
     bubbleImage.translatesAutoresizingMaskIntoConstraints = false
     if let image = NEKitChatConfig.shared.ui.rightBubbleBg {
       bubbleImage.image = image
@@ -169,6 +169,7 @@ class ChatBaseRightCell: ChatBaseCell {
       pinImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -4),
     ])
   }
+
 
   func addGesture() {
 //        avatar

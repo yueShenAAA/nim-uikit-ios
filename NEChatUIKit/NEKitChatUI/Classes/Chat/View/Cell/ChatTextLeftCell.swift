@@ -17,6 +17,7 @@ class ChatTextLeftCell: ChatBaseLeftCell {
   }
 
   func commonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     textLable.translatesAutoresizingMaskIntoConstraints = false
     textLable.isEnabled = false
 //        textView.isScrollEnabled = false

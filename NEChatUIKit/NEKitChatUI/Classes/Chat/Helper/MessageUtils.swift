@@ -29,7 +29,7 @@ public class MessageUtils {
     option.compressQuality = 0.8
     imageObject.option = option
     message.messageObject = imageObject
-    message.apnsContent = localizable("send_picture")
+    message.apnsContent = localizable("发来了一张图片")
     message.setting = messageSetting()
     return message
   }
@@ -38,7 +38,7 @@ public class MessageUtils {
     let messageObject = NIMAudioObject(sourcePath: filePath)
     let message = NIMMessage()
     message.messageObject = messageObject
-    message.apnsContent = localizable("send_voice")
+    message.apnsContent = localizable("发来了一段语音")
     message.setting = messageSetting()
     return message
   }
@@ -47,10 +47,19 @@ public class MessageUtils {
     let messageObject = NIMVideoObject(sourcePath: filePath)
     let message = NIMMessage()
     message.messageObject = messageObject
-    message.apnsContent = localizable("send_video")
+    message.apnsContent = localizable("发来了一段视频")
     message.setting = messageSetting()
     return message
   }
+    
+    public class func locationMessage(latitude: Double, longitude: Double, title: String) -> NIMMessage {
+      let messageObject = NIMLocationObject(latitude: latitude, longitude: longitude, title: title)
+      let message = NIMMessage()
+      message.messageObject = messageObject
+      message.apnsContent = localizable("发来了一个定位")
+      message.setting = messageSetting()
+      return message
+    }
 
   public class func messageSetting() -> NIMMessageSetting {
     let setting = NIMMessageSetting()

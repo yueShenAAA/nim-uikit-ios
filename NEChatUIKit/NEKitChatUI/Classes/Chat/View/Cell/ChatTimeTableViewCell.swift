@@ -9,6 +9,7 @@ class ChatTimeTableViewCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     selectionStyle = .none
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     contentView.addSubview(timeLable)
     NSLayoutConstraint.activate([
       timeLable.topAnchor.constraint(equalTo: contentView.topAnchor),

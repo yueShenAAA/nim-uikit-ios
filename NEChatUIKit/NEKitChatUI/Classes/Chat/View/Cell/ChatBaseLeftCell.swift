@@ -33,9 +33,9 @@ class ChatBaseLeftCell: ChatBaseCell {
   }
 
   func baseCommonUI() {
+      backgroundColor = UIColor(hexString: "#FAFAF7")
     // avatar
     selectionStyle = .none
-    backgroundColor = .white
     avatarImage.layer.cornerRadius = 16
     avatarImage.backgroundColor = UIColor(hexString: "#537FF4")
     avatarImage.translatesAutoresizingMaskIntoConstraints = false

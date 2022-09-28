@@ -18,17 +18,17 @@ extension String {
   static func stringFromDate(date: Date) -> String {
     let fmt = DateFormatter()
     if Calendar.current.isDateInToday(date) {
-      fmt.dateFormat = localizable("hm")
+      fmt.dateFormat = "HH:mm"
     } else {
       if let firstDayYear = firstDayInYear() {
         let dur = date.timeIntervalSince(firstDayYear)
         if dur > 0 {
-          fmt.dateFormat = localizable("mdhm")
+          fmt.dateFormat = "MM月dd日 HH:mm"
         } else {
-          fmt.dateFormat = localizable("ymdhm")
+          fmt.dateFormat = "yyyy年MM月dd日 HH:mm"
         }
       } else {
-        fmt.dateFormat = localizable("ymdhm")
+        fmt.dateFormat = "yyyy年MM月dd日 HH:mm"
       }
     }
     return fmt.string(from: date)

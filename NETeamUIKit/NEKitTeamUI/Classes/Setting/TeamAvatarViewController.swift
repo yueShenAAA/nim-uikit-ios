@@ -8,8 +8,7 @@ import NEKitCommonUI
 import NIMSDK
 import NEKitTeam
 
-public class TeamAvatarViewController: NEBaseViewController, UICollectionViewDelegate,
-  UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UINavigationControllerDelegate {
+public class TeamAvatarViewController: NEBaseViewController,UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout,UINavigationControllerDelegate  {
   typealias SaveCompletion = () -> Void
 
   var block: SaveCompletion?
@@ -50,8 +49,8 @@ public class TeamAvatarViewController: NEBaseViewController, UICollectionViewDel
   }
 
   func setupUI() {
-    title = localizable("modify_headImage")
-    addRightAction(localizable("save"), #selector(savePhoto), self)
+    title = "修改头像"
+    addRightAction("保存", #selector(savePhoto), self)
 
     view.backgroundColor = NEConstant.hexRGB(0xF1F1F6)
     let headerBack = UIView()
@@ -167,7 +166,7 @@ public class TeamAvatarViewController: NEBaseViewController, UICollectionViewDel
     if let type = team?.type, type == .normal {
       return true
     }
-    if let ownerId = team?.owner, IMKitEngine.instance.isMySelf(ownerId) {
+    if let ownerId = team?.owner, IMKitLoginManager.instance.isMySelf(ownerId) {
       return true
     }
     if let mode = team?.updateInfoMode, mode == .all {
@@ -185,108 +184,108 @@ public class TeamAvatarViewController: NEBaseViewController, UICollectionViewDel
        // Pass the selected object to the new view controller.
    }
    */
+        //MARK: objc 方法
+    
+    @objc func uploadPhoto() {
+      print("upload photo")
+      showBottomAlert(self)
+    }
 
-  // MARK: objc 方法
+    @objc func savePhoto() {
+      print("save photo")
+      if let tid = team?.teamId {
+        view.makeToastActivity(.center)
+        weak var weakSelf = self
 
-  @objc func uploadPhoto() {
-    print("upload photo")
-    showBottomAlert(self)
-  }
-
-  @objc func savePhoto() {
-    print("save photo")
-    if let tid = team?.teamId {
-      view.makeToastActivity(.center)
-      weak var weakSelf = self
-
-      repo.fetchNOSURL(url: headerUrl) { error, urlStr in
-        if error == nil {
-          weakSelf?.repo.updateTeamIcon(urlStr ?? "", tid) { error in
-            weakSelf?.view.hideToastActivity()
-            if let err = error {
-              weakSelf?.showToast(err.localizedDescription)
-            } else {
-              weakSelf?.team?.avatarUrl = weakSelf?.headerUrl
-              if let completion = weakSelf?.block {
-                completion()
+        repo.fetchNOSURL(url: headerUrl) { error, urlStr in
+          if error == nil {
+            weakSelf?.repo.updateTeamIcon(urlStr ?? "", tid) { error in
+              weakSelf?.view.hideToastActivity()
+              if let err = error {
+                weakSelf?.showToast(err.localizedDescription)
+              } else {
+                weakSelf?.team?.avatarUrl = weakSelf?.headerUrl
+                if let completion = weakSelf?.block {
+                  completion()
+                }
+                weakSelf?.navigationController?.popViewController(animated: true)
               }
-              weakSelf?.navigationController?.popViewController(animated: true)
             }
           }
         }
       }
     }
-  }
-
-  // MAKR: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
-  public func collectionView(_ collectionView: UICollectionView,
-                             numberOfItemsInSection section: Int) -> Int {
-    5
-  }
-
-  public func collectionView(_ collectionView: UICollectionView,
-                             cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    if let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: "\(TeamDefaultIconCell.self)",
-      for: indexPath
-    ) as? TeamDefaultIconCell {
-      cell.iconImage.image = coreLoader.loadImage("icon_\(indexPath.row)")
-
-      return cell
+    
+    //MAKR: UICollectionViewDelegate, UICollectionViewDataSource,UICollectionViewDelegateFlowLayout
+    public func collectionView(_ collectionView: UICollectionView,
+                               numberOfItemsInSection section: Int) -> Int {
+      5
     }
-    return UICollectionViewCell()
-  }
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             layout collectionViewLayout: UICollectionViewLayout,
-                             minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    let space = (view.width - 297.0) / 4.0
-    print("mini inter : ", space)
-    return space
-  }
+    public func collectionView(_ collectionView: UICollectionView,
+                               cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      if let cell = collectionView.dequeueReusableCell(
+        withReuseIdentifier: "\(TeamDefaultIconCell.self)",
+        for: indexPath
+      ) as? TeamDefaultIconCell {
+        cell.iconImage.image = coreLoader.loadImage("icon_\(indexPath.row)")
 
-  public func collectionView(_ collectionView: UICollectionView,
-                             didSelectItemAt indexPath: IndexPath) {
-    if TeamRouter.iconUrls.count > indexPath.row {
-      headerUrl = TeamRouter.iconUrls[indexPath.row]
-      // headerView.image = coreLoader.loadImage("icon_\(indexPath.row)")
-      headerView.sd_setImage(with: URL(string: headerUrl), completed: nil)
+        return cell
+      }
+      return UICollectionViewCell()
     }
-  }
 
-  // MARK: UINavigationControllerDelegate
+    public func collectionView(_ collectionView: UICollectionView,
+                               layout collectionViewLayout: UICollectionViewLayout,
+                               minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+      let space = (view.width - 297.0) / 4.0
+      print("mini inter : ", space)
+      return space
+    }
 
-  func imagePickerController(_ picker: UIImagePickerController,
-                             didFinishPickingMediaWithInfo info: [UIImagePickerController
-                               .InfoKey: Any]) {
-    let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
-    uploadHeadImage(image: image)
-    picker.dismiss(animated: true, completion: nil)
-  }
-
-  public func uploadHeadImage(image: UIImage) {
-    view.makeToastActivity(.center)
-    if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
-      let filePath = NSHomeDirectory().appending("/Documents/")
-        .appending(IMKitEngine.instance.imAccid)
-      let succcess = imageData.write(toFile: filePath, atomically: true)
-      weak var weakSelf = self
-      if succcess {
-        NIMSDK.shared().resourceManager
-          .upload(filePath, progress: nil) { urlString, error in
-            if error == nil {
-              // 显示设置的照片
-              weakSelf?.headerView.image = image
-              if let url = urlString {
-                weakSelf?.headerUrl = url
-              }
-              print("upload image success")
-            } else {
-              print("upload image failed,error = \(error!)")
-            }
-            weakSelf?.view.hideToastActivity()
-          }
+    public func collectionView(_ collectionView: UICollectionView,
+                               didSelectItemAt indexPath: IndexPath) {
+      if TeamRouter.iconUrls.count > indexPath.row {
+        headerUrl = TeamRouter.iconUrls[indexPath.row]
+        // headerView.image = coreLoader.loadImage("icon_\(indexPath.row)")
+        headerView.sd_setImage(with: URL(string: headerUrl), completed: nil)
       }
     }
-  }
+    
+    //MARK: UINavigationControllerDelegate
+    
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController
+                                 .InfoKey: Any]) {
+      let image: UIImage = info[UIImagePickerController.InfoKey.editedImage] as! UIImage
+      uploadHeadImage(image: image)
+      picker.dismiss(animated: true, completion: nil)
+    }
+
+    public func uploadHeadImage(image: UIImage) {
+      view.makeToastActivity(.center)
+      if let imageData = image.jpegData(compressionQuality: 0.6) as NSData? {
+        let filePath = NSHomeDirectory().appending("/Documents/")
+          .appending(IMKitLoginManager.instance.imAccid)
+        let succcess = imageData.write(toFile: filePath, atomically: true)
+        weak var weakSelf = self
+        if succcess {
+          NIMSDK.shared().resourceManager
+            .upload(filePath, progress: nil) { urlString, error in
+              if error == nil {
+                // 显示设置的照片
+                weakSelf?.headerView.image = image
+                if let url = urlString {
+                  weakSelf?.headerUrl = url
+                }
+                print("upload image success")
+              } else {
+                print("upload image failed,error = \(error!)")
+              }
+              weakSelf?.view.hideToastActivity()
+            }
+        }
+      }
+    }
 }
+
